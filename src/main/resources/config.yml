@@ -1,0 +1,23 @@
+cooldown-seconds: 3
+
+messages:
+  cooldown: "&cPlease wait before messaging FruitBot again!"
+  no-permission: "&cYou don't have permission to use FruitBot!"
+  player-only: "&cOnly players can use this command!"
+  no-target: "&cNo target player found!"
+
+formats:
+  response: "&a[FruitBot] &f%message%"
+  player-message: "%player%: %message%"
+
+response-delay-ms: 1000
+onboarding:
+  welcome-enabled: true
+  checkup-enabled: true
+  welcome-back-enabled: true
+  welcome-delay-seconds: 5
+  welcome-back-delay-seconds: 3
+  checkup-delay-seconds: 900
+xray-tracker-enabled: true
+spy-enabled: true
+fruitbot-enabled: true

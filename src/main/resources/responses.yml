@@ -1,0 +1,403 @@
+default:
+  - "I can't help with that yet. Please message a mod if one is online or use /ticket <info>."
+  - "I'm not sure I understand. Try rephrasing, or contact staff. You can also use /ticket <info>."
+  - "I don't have an answer for that. For assistance, message a mod or join our Discord with /discord."
+  - "I'm unable to assist with that request. Please reach out to staff or submit a /ticket <info>."
+
+responses:
+  hello:
+    - "Hey there. Welcome to Fruit Survival. Use /rtp to get started, then /sethome to save your spot."
+    - "Hi! I can help with basics: try asking about rules, protection, jobs, shop, or voting."
+    - "Hey! If you need a hand, message a mod if online or use /ticket <info> when no staff are around."
+    - "Hello! Join our Discord with /member or /discord to connect and get the Member rank."
+    
+  hi:
+    - "Hi. Use /rtp to begin, then /sethome to save your base and /home to return."
+    - "Hi there! For support, message a mod if one is online or use /ticket <info> if not."
+    - "Hello! Join with /member or /discord to get the Member rank and see announcements."
+    
+  rtp:
+    - "Use /rtp to teleport to a random location."
+    - "Use /rtp to get started, then /sethome to save your spot."
+    
+  rules:
+    - "Read the rules with /rules."
+    
+  member:
+    - "Use /member or /discord to join our Discord and obtain the Member rank."
+    - "Obtaining the Member rank grants a cool pickaxe, 2 /sethomes, and some cash to start your journey. Try /member for more info."
+    
+  discord:
+    - "Use /discord to get an invite. Joining Discord can grant the Member rank via /member."
+    - "Discord is best for announcements and support when staff aren’t online."
+    - "Rules apply in Discord as well."
+    
+  protection:
+    - "Land claiming is not used. Visit /warp protection for info on container and door protection."
+    - "Protect containers and doors as described at /warp protection."
+    - "Griefing is not allowed. Staff can rollback any damage."
+    
+  griefing:
+    - "Griefing is not allowed. Report with /ticket <info> if no staff are online or message a mod if available."
+    - "Staff can rollback damage. Provide coordinates or screenshots if possible."
+
+  marry:
+    - "To request to marry another player, please message a mod. If no staff are online, use /ticket <info>."
+
+  marriage:
+    - "Marriage requests are handled by staff. Please message a mod, or use /ticket <info> if no staff are online."
+
+  wedding:
+    - "Message a mod to request a marriage. If staff aren't available, submit /ticket <info>."
+
+  basics:
+    - "Use /basics for a quick guide to getting started. You can also ask me about rules, protection, jobs, shop, and vote."
+
+  info:
+    - "Use /info for helpful information for new players. You can also use /rules and /member."
+
+  events:
+    - "Community events are held at 8pm on Wednesdays and Fridays. Check Discord for details."
+    - "Events run at 8pm Wed & Fri. Join /discord for announcements."
+
+  chest shop:
+    - "You can create your own chest shops. Visit /warp chestshop for instructions."
+    - "Player chest shops are explained at /warp chestshop."
+
+  chestshop:
+    - "Visit /warp chestshop to learn how to set up your own chest shop."
+    
+  ticket:
+    - "Use /ticket <info> to submit a help ticket if no staff are online. Include names, coordinates, and details."
+    - "Tickets are reviewed by staff as soon as possible."
+    - "For urgent matters, message a mod if one is online or mention @Staff in our discord."
+    
+  jobs:
+    - "Earn money with /jobs or visit /warp jobs."
+    - "Use /jobs to select a job."
+    
+  shop:
+    - "Spend money at /warp shop or trade with other players."
+    - "Bring items to sell or buy essentials at the shop."
+    
+  economy:
+    - "You can earn money with /jobs or /warp jobs and spend it at /warp shop or by trading."
+    - "Check your balance with /balance."
+    - "Ask a mod if you need help with the economy."
+
+  eco:
+    - "Earn money with /jobs or at /warp jobs, and spend it at /warp shop or by trading."
+    - "Check balance with /balance."
+
+  money:
+    - "You can make money with /jobs and spend it at /warp shop."
+    - "Make money with /jobs. Check your balance with /balance or /bal."
+
+  cash:
+    - "Cash is earned through /jobs and trades. Spend it at /warp shop."
+
+  balance:
+    - "Check your balance with /balance or /bal."
+
+  bal:
+    - "Use /bal to view your balance."
+    
+  store:
+    - "Support the server at /store. Perks are available as buyable extras."
+    - "Ranks are rewarded for reaching donation milestones. Use /store for details."
+
+  donate:
+    - "You can support the server with /store."
+    - "Donation milestones grant ranks. Use /store for more info."
+
+  donation:
+    - "Ranks are rewarded for donation milestones. Use /store for details."
+
+  perks:
+    - "Donator perks can be found in the /store."
+    
+  perk:
+    - "Donator perks are available in the /store."
+    
+  home:
+    - "Set a home with /sethome or /sethome <name>. Return with /home or /home <name>."
+    
+  teleport:
+    - "Request to teleport with /tpa <player>. Accept with /tpaccept, deny with /tpdeny."
+
+  teleport to me:
+    - "Use /tpahere to ask a player to come to you."
+    
+  report:
+    - "For urgent problems, contact online staff if available, or contact us via discord."
+    
+  help:
+    - "Use /help for command categories. Common: /rtp, /warp, /sethome, /home, /tpa, /back, /rules, /member, /discord, /duel."
+    - "Ask me keywords like rtp, rules, protection, jobs, shop, ticket, vote, events, pvp, duel, bot."
+
+  nether:
+    - "Build a portal with obsidian and flint & steel. Be prepared for tougher mobs."
+    - "Visit /warp nether for a portal."
+
+  end:
+    - "Visit /warp end for the End portal. Bring gear if needed."
+
+  farms:
+    - "Visit /warp farm for a public farm. Be sure to replant."
+
+  farm:
+    - "Visit /warp farm for a public farm. Be sure to replant."
+
+  bed:
+    - "Sleep in a bed to set your spawn point. Use /home bed to return to your bed."
+
+  beds:
+    - "Use a bed at your base to avoid long walks after death. Use /home bed to return to your bed."
+
+  coords:
+    - "Press F3 (Java) to view coordinates. Share coords with trusted friends only."
+
+  pvp:
+    - "PvP is disabled in the main survival world. For fights, visit /warp pvp or use /duel <player>."
+    - "Use /duel <player> to request a duel."
+
+  duel:
+    - "Challenge another player with /duel <player>."
+    - "For arenas, go to /warp pvp."
+
+  duels:
+    - "Use /duel <player> or visit /warp pvp. PvP is disabled in the main survival world."
+
+  warp pvp:
+    - "Visit /warp pvp to fight. PvP is disabled in the main survival world."
+
+  mobs:
+    - "Hostile mobs can spawn in random sizes here to keep combat fun."
+    - "Be careful—bigger mobs can hit harder, smaller ones can be tricky."
+
+  hostile mobs:
+    - "We use a plugin that makes hostile mobs random sizes for variety in combat."
+
+  random size:
+    - "Hostile mobs may appear in random sizes to spice up fights."
+
+  coinflip:
+    - "Start a coinflip with /cf <amount>. View your stats with /cf stats. Cancel a pending game with /cf cancel."
+    - "Use /cf <amount> to wager, /cf stats for stats, and /cf cancel to cancel open coinflips."
+
+  cf:
+    - "Usage: /cf <amount> to create a coinflip, /cf stats to view stats, /cf cancel to cancel pending games."
+
+  coin flip:
+    - "Create a coinflip with /cf <amount>. Check stats via /cf stats. Cancel with /cf cancel."
+
+  skyblock:
+    - "Use /hub to return to the hub and select Skyblock. You're currently on Survival."
+    - "Skyblock is available from the hub. Type /hub and choose Skyblock."
+
+  prison:
+    - "Use /hub to return to the hub and select Prison. You're currently on Survival."
+    - "Prison is accessed from the hub. Type /hub to switch."
+
+  pixelmon:
+    - "Use /hub to return to the hub and select Pixelmon. You're currently on Survival."
+    - "Pixelmon is in a different mode. Type /hub to find it."
+
+  vote:
+    - "Support the server with /vote. Voting often gives rewards and keys."
+    - "Use your vote keys at /warp crates."
+    - "If a link doesn't work, try again later or check Discord."
+    - "Remember to claim rewards after voting, usually via /vote or a crate."
+
+  voting:
+    - "Use /vote to see links and claim rewards."
+    - "Use your vote keys at /warp crates."
+    - "Need help voting? Ask a mod or check Discord."
+
+  rank:
+    - "View ranks and perks with /ranks or on the server website."
+    - "Some commands (extra homes, kits) may require higher ranks."
+    - "Ask staff if you're unsure how to rank up."
+
+  about bot:
+    - "I'm FruitbotChat, a private-message helper. Message me with /msg fruitbot <text> or reply with /r."
+    - "I guide new players, answer common questions, and escalate to staff when needed."
+    - "If I can't help, message a mod if online or use /ticket <info>."
+
+  who are you:
+    - "I'm FruitbotChat, here to help you navigate Fruit Survival. Use /msg fruitbot <text> to talk to me."
+    - "I can answer FAQs about rules, protection, jobs, warps, voting, and more."
+
+  what are you:
+    - "I'm a chatbot that replies in private messages and doesn't replace staff."
+    - "Use /r to continue a conversation with me."
+
+  fruitbot:
+    - "You can talk to me with /msg fruitbot <text> or /r to reply."
+    - "Ask me about rtp, rules, protection, jobs, shop, vote, events, ticket, member, discord."
+
+  bot:
+    - "I'm the server's helper bot. Here to help with common questions."
+
+  xray:
+    - "X-ray and similar cheats are not allowed. Suspicious mining is investigated and may be punished."
+
+  xraying:
+    - "X-raying is against the rules. Staff can review logs and take action."
+
+  x-ray:
+    - "X-ray is not allowed. Please play fair."
+
+  claim:
+    - "Land claiming is not used. Visit /warp protection for info on container and door protection."
+    - "Land claiming is not a feature here. Griefing isn't allowed and staff can rollback damage."
+
+  land claim:
+    - "We don't use land claims. See /warp protection for how containers and doors are protected."
+    - "If you have issues, message a mod or use /ticket <info>."
+
+  landclaim:
+    - "No land claiming here. Use /warp protection for protection info."
+    - "This server does not use land claiming. Report griefing with /ticket <info> if no staff are online."
+
+  events:
+    - "Events are announced in Discord. Use /discord or /member to join."
+    - "Ask a mod about upcoming events if one is online."
+
+  event:
+    - "Check Discord for event announcements and schedules."
+    - "If you have an idea for an event, suggest it in Discord."
+
+  hey:
+    - "Hey. Need help with anything? Try /help or ask me about rules, warps, jobs, shop, vote."
+    - "Hi. You can message a mod if online or use /ticket <info> when staff aren't around."
+
+  yo:
+    - "Yo. Use /rtp to get started and /sethome to save your spot."
+    - "Ask me about protection, jobs, shop, or voting."
+
+  sup:
+    - "Hey. If you need help, ask about rules, warps, jobs, shop, vote, ticket."
+
+  greetings:
+    - "Greetings. I can help with server navigation, rules, and more."
+
+  thanks:
+    - "You're welcome. If you need anything else, just ask or message a mod."
+    - "Anytime. Remember /ticket <info> if no staff are online."
+
+  thank you:
+    - "You're welcome. Happy playing on Fruit Survival."
+
+  ty:
+    - "np! Need more help? /r to reply."
+
+  bye:
+    - "Goodbye. See you around!"
+    - "Bye! Come back if you need help."
+
+  goodbye:
+    - "Take care. If you need assistance next time, message a mod or /ticket <info>."
+
+  see ya:
+    - "See you!"
+
+  cya:
+    - "Cya!"
+
+  gn:
+    - "Good night!"
+
+  good night:
+    - "Sleep well!"
+
+  how are you:
+    - "I'm here and ready to help. How can I assist you?"
+    - "Doing great. Need help with anything on the server?"
+
+  hru:
+    - "I'm good, thanks. What do you need help with?"
+
+  how r u:
+    - "All good here. Ask me about rules, warps, jobs, shop, vote."
+
+  ok:
+    - "Okay. If you need more help, just ask or /r to reply."
+
+  okay:
+    - "Okay. I'm here if you need anything else."
+
+  k:
+    - "Got it."
+
+  warp shards:
+    - "Player warps are set up by staff when you collect 10 Warp Shards. Message a mod when you have them."
+    - "Got 10 Warp Shards? Ask a mod to set up your warp."
+
+  shards:
+    - "Collect 10 Warp Shards and staff can create a warp for you."
+    - "When you reach 10 Warp Shards, message a Mod+ or Admin for setup."
+
+  make a warp:
+    - "Player warps require 10 Warp Shards and a staff member to set them up."
+    - "After collecting shards, contact a mod to create your warp."
+
+  create a warp:
+    - "Staff can set a warp for you once you have 10 Warp Shards."
+
+  fq:
+    - "Open quests and rewards with /fq."
+    - "Use /fq to view available quests and claim rewards."
+
+  quests:
+    - "Use /fq to access quests and rewards."
+    - "Complete quests via /fq to earn rewards."
+
+  quest:
+    - "Open the quest menu with /fq."
+
+  fruit tokens:
+    - "Fruit Tokens are high-value items used to unlock powerful gear at /warp token."
+    - "Visit /warp token to spend Fruit Tokens on high-powered gear."
+
+  token:
+    - "Use Fruit Tokens at /warp token to unlock gear."
+
+  tokens:
+    - "Fruit Tokens can be spent at /warp token."
+
+  food:
+    - "Free food is available at /warp food."
+    - "Hungry? Visit /warp food."
+
+  crates:
+    - "Use your vote keys at /warp crates."
+    - "Crates are at /warp crates."
+
+  crate:
+    - "Crates can be opened at /warp crates."
+
+  key:
+    - "Vote keys are used at /warp crates."
+
+  keys:
+    - "Use keys at /warp crates."
+
+  ignore:
+    - "Use /ignore <player> to mute a player who is disturbing or offensive for you."
+    - "You can unignore with /unignore <player> if supported."
+
+  mute:
+    - "You can mute a player for yourself using /ignore <player>. You can mute Fruitbot by replying with /r mute."
+
+  staff:
+    - "Visit the staff team at /warp staff. If you need help, message a mod if one is online or use /ticket <info>."
+
+  staff warp:
+    - "Visit the team at /warp staff."
+
+  apply:
+    - "Apply for the staff team with /apply."
+
+  application:
+    - "Use /apply to submit a staff application."
