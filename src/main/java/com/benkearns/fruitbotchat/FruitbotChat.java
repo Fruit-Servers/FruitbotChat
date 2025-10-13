@@ -16,6 +16,8 @@ public final class FruitbotChat extends JavaPlugin {
     private static FruitbotChat instance;
     private FileConfiguration config;
     private FileConfiguration responses;
+    private FileConfiguration unknownMessages;
+    private File unknownMessagesFile;
     private final Map<UUID, UUID> lastMessagedBy = new HashMap<>();
     private final Map<UUID, Long> cooldowns = new HashMap<>();
     private final Set<UUID> lastTargetWasFruitbot = new HashSet<>();
@@ -42,6 +44,7 @@ public final class FruitbotChat extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         loadResponses();
+        loadUnknownMessages();
         loadConfigValues();
         Bukkit.getPluginManager().registerEvents(new FruitbotCommandListener(this), this);
         OnboardingListener onboarding = new OnboardingListener(this);
@@ -81,6 +84,9 @@ public final class FruitbotChat extends JavaPlugin {
         long delayTicks = Math.max(0L, responseDelayMs) / 50L;
         Bukkit.getScheduler().runTaskLater(this, () -> {
             ResponseResult result = getResponseWithKey(message);
+            if (result != null && "default".equalsIgnoreCase(result.key)) {
+                logUnknownMessage(player, message);
+            }
             if (result != null && "mute".equalsIgnoreCase(result.key)) {
                 pendingMuteConfirm.add(player.getUniqueId());
             }
@@ -99,6 +105,7 @@ public final class FruitbotChat extends JavaPlugin {
     
     private ResponseResult getResponseWithKey(String originalMessage) {
         String msg = originalMessage == null ? "" : originalMessage.toLowerCase(Locale.ROOT);
+        boolean foundMatch = false;
         if (responses.getConfigurationSection("responses") != null) {
             for (String key : responses.getConfigurationSection("responses").getKeys(false)) {
                 String k = key.toLowerCase(Locale.ROOT);
@@ -107,6 +114,7 @@ public final class FruitbotChat extends JavaPlugin {
                     List<String> possibleResponses = responses.getStringList("responses." + key);
                     if (!possibleResponses.isEmpty()) {
                         String text = possibleResponses.get(new Random().nextInt(possibleResponses.size()));
+                        foundMatch = true;
                         return new ResponseResult(key, text);
                     }
                 }
@@ -159,6 +167,32 @@ public final class FruitbotChat extends JavaPlugin {
         }
         
         responses = YamlConfiguration.loadConfiguration(responsesFile);
+    }
+    
+    private void loadUnknownMessages() {
+        unknownMessagesFile = new File(getDataFolder(), "unknown_messages.yml");
+        if (!unknownMessagesFile.exists()) {
+            try {
+                unknownMessagesFile.createNewFile();
+            } catch (java.io.IOException e) {
+                getLogger().warning("Could not create unknown_messages.yml: " + e.getMessage());
+            }
+        }
+        unknownMessages = YamlConfiguration.loadConfiguration(unknownMessagesFile);
+    }
+    
+    private void logUnknownMessage(Player player, String message) {
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String key = "messages." + System.currentTimeMillis();
+        unknownMessages.set(key + ".player", player.getName());
+        unknownMessages.set(key + ".uuid", player.getUniqueId().toString());
+        unknownMessages.set(key + ".message", message);
+        unknownMessages.set(key + ".timestamp", timestamp);
+        try {
+            unknownMessages.save(unknownMessagesFile);
+        } catch (java.io.IOException e) {
+            getLogger().warning("Could not save unknown message: " + e.getMessage());
+        }
     }
     
     public static FruitbotChat getInstance() {
