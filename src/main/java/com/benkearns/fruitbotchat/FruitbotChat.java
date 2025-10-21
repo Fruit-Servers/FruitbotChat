@@ -18,6 +18,7 @@ public final class FruitbotChat extends JavaPlugin {
     private FileConfiguration responses;
     private FileConfiguration unknownMessages;
     private File unknownMessagesFile;
+    private WikiService wikiService;
     private final Map<UUID, UUID> lastMessagedBy = new HashMap<>();
     private final Map<UUID, Long> cooldowns = new HashMap<>();
     private final Set<UUID> lastTargetWasFruitbot = new HashSet<>();
@@ -46,6 +47,7 @@ public final class FruitbotChat extends JavaPlugin {
         loadResponses();
         loadUnknownMessages();
         loadConfigValues();
+        wikiService = new WikiService();
         Bukkit.getPluginManager().registerEvents(new FruitbotCommandListener(this), this);
         OnboardingListener onboarding = new OnboardingListener(this);
         Bukkit.getPluginManager().registerEvents(onboarding, this);
@@ -57,6 +59,9 @@ public final class FruitbotChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (wikiService != null) {
+            wikiService.shutdown();
+        }
         getLogger().info("FruitbotChat has been disabled!");
     }
     
@@ -120,11 +125,42 @@ public final class FruitbotChat extends JavaPlugin {
                 }
             }
         }
+        
+        if (wikiService != null && shouldTryWikiLookup(originalMessage)) {
+            String wikiResponse = wikiService.searchAndSummarize(originalMessage);
+            if (wikiResponse != null && !wikiResponse.trim().isEmpty()) {
+                return new ResponseResult("wiki", wikiResponse);
+            }
+        }
+        
         List<String> defaultResponses = responses.getStringList("default");
         if (!defaultResponses.isEmpty()) {
             return new ResponseResult("default", defaultResponses.get(new Random().nextInt(defaultResponses.size())));
         }
         return new ResponseResult("default", "I'm not sure how to respond to that. Can you try asking me something else?");
+    }
+    
+    private boolean shouldTryWikiLookup(String message) {
+        if (message == null || message.trim().length() < 3) return false;
+        
+        String lower = message.toLowerCase().trim();
+        
+        if (lower.matches("^[yn]$|^yes$|^no$|^ok$|^okay$|^k$|^thanks?$|^ty$|^bye$|^hello$|^hi$|^hey$")) {
+            return false;
+        }
+        
+        String[] questionWords = {"what", "how", "where", "when", "why", "who", "can", "is", "are", "do", "does"};
+        for (String word : questionWords) {
+            if (lower.startsWith(word + " ") || lower.contains(" " + word + " ")) {
+                return true;
+            }
+        }
+        
+        if (lower.contains("?") || lower.split("\\s+").length >= 2) {
+            return true;
+        }
+        
+        return false;
     }
     
     boolean isOnCooldown(Player player) {
