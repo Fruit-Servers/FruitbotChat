@@ -13,12 +13,15 @@ import java.util.regex.Pattern;
 
 public class WikiService {
     private static final String WIKI_BASE_URL = "https://fruitservers.net/wiki";
-    private static final String SEARCH_URL = WIKI_BASE_URL + "/api.php?action=opensearch&search=%s&limit=3&namespace=0&format=json";
-    private static final String PAGE_URL = WIKI_BASE_URL + "/api.php?action=parse&page=%s&format=json&prop=text&section=0";
     
     private final OkHttpClient client;
     private final Map<String, CachedResponse> cache = new HashMap<>();
     private static final long CACHE_DURATION = TimeUnit.HOURS.toMillis(1);
+    private String wikiContent = null;
+    private long lastWikiLoad = 0;
+    private final Map<String, String> wikiSections = new HashMap<>();
+    private final Map<String, String> allPages = new HashMap<>();
+    private final Set<String> crawledUrls = new HashSet<>();
     
     public WikiService() {
         this.client = new OkHttpClient.Builder()
@@ -34,143 +37,245 @@ public class WikiService {
                 return cached.response;
             }
             
-            List<String> searchResults = searchWiki(query);
-            if (searchResults.isEmpty()) {
+            loadWikiContent();
+            if (wikiContent == null) {
                 return null;
             }
             
-            String bestMatch = findBestMatch(query, searchResults);
-            if (bestMatch == null) {
-                return null;
-            }
-            
-            String content = getPageContent(bestMatch);
-            if (content == null) {
-                return null;
-            }
-            
-            String summary = summarizeContent(content, query);
-            if (summary != null) {
+            String summary = findRelevantContent(query);
+            if (summary != null && !summary.trim().isEmpty()) {
                 cache.put(query.toLowerCase(), new CachedResponse(summary, System.currentTimeMillis()));
+                return summary;
             }
             
-            return summary;
+            return null;
         } catch (Exception e) {
             return null;
         }
     }
     
-    private List<String> searchWiki(String query) throws IOException {
-        String url = String.format(SEARCH_URL, query.replace(" ", "%20"));
-        Request request = new Request.Builder().url(url).build();
-        
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) return Collections.emptyList();
-            
-            String json = response.body().string();
-            return parseSearchResults(json);
+    private void loadWikiContent() throws IOException {
+        if (wikiContent != null && System.currentTimeMillis() - lastWikiLoad < CACHE_DURATION) {
+            return;
         }
+        
+        crawledUrls.clear();
+        allPages.clear();
+        
+        crawlWikiPages(WIKI_BASE_URL, 0);
+        
+        StringBuilder allContent = new StringBuilder();
+        for (Map.Entry<String, String> page : allPages.entrySet()) {
+            allContent.append("PAGE: ").append(page.getKey()).append("\n");
+            allContent.append(page.getValue()).append("\n\n");
+        }
+        
+        wikiContent = allContent.toString();
+        lastWikiLoad = System.currentTimeMillis();
+        parseWikiSections();
     }
     
-    private List<String> parseSearchResults(String json) {
-        List<String> results = new ArrayList<>();
-        try {
-            json = json.trim();
-            if (json.startsWith("[") && json.endsWith("]")) {
-                String[] parts = json.substring(1, json.length() - 1).split(",(?=\\[)");
-                if (parts.length >= 2) {
-                    String titlesSection = parts[1].trim();
-                    if (titlesSection.startsWith("[") && titlesSection.endsWith("]")) {
-                        String[] titles = titlesSection.substring(1, titlesSection.length() - 1).split(",");
-                        for (String title : titles) {
-                            String cleaned = title.trim().replaceAll("^\"|\"$", "");
-                            if (!cleaned.isEmpty()) {
-                                results.add(cleaned);
-                            }
-                        }
+    private void crawlWikiPages(String url, int depth) throws IOException {
+        if (depth > 2 || crawledUrls.contains(url) || crawledUrls.size() > 50) {
+            return;
+        }
+        
+        crawledUrls.add(url);
+        
+        Request request = new Request.Builder().url(url).build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) return;
+            
+            String html = response.body().string();
+            Document doc = Jsoup.parse(html, url);
+            
+            doc.select("script, style, .navbox, .infobox, .mw-editsection, nav, header, footer").remove();
+            
+            Elements contentElements = doc.select(".mw-parser-output, .content, #content, main");
+            if (contentElements.isEmpty()) {
+                contentElements = doc.select("body");
+            }
+            
+            StringBuilder pageContent = new StringBuilder();
+            for (Element element : contentElements) {
+                extractTextContent(element, pageContent);
+            }
+            
+            String pageName = extractPageName(url);
+            if (pageContent.length() > 100) {
+                allPages.put(pageName, pageContent.toString());
+            }
+            
+            if (depth < 2) {
+                Elements links = doc.select("a[href]");
+                for (Element link : links) {
+                    String href = link.absUrl("href");
+                    if (isValidWikiLink(href)) {
+                        crawlWikiPages(href, depth + 1);
                     }
                 }
             }
         } catch (Exception e) {
         }
-        return results;
     }
     
-    private String findBestMatch(String query, List<String> results) {
+    private String extractPageName(String url) {
+        if (url.equals(WIKI_BASE_URL)) {
+            return "Home";
+        }
+        
+        String[] parts = url.split("/");
+        if (parts.length > 0) {
+            String lastPart = parts[parts.length - 1];
+            return lastPart.replace("_", " ").replace("%20", " ");
+        }
+        return "Unknown";
+    }
+    
+    private boolean isValidWikiLink(String href) {
+        if (href == null || !href.startsWith(WIKI_BASE_URL)) {
+            return false;
+        }
+        
+        if (href.contains("#") || href.contains("?") || href.contains("action=")) {
+            return false;
+        }
+        
+        if (href.contains("Special:") || href.contains("File:") || href.contains("Category:")) {
+            return false;
+        }
+        
+        return !crawledUrls.contains(href);
+    }
+    
+    private void extractTextContent(Element element, StringBuilder content) {
+        Elements paragraphs = element.select("p, li, h1, h2, h3, h4, h5, h6, .mw-headline");
+        for (Element p : paragraphs) {
+            String text = p.text().trim();
+            if (text.length() > 10 && !text.startsWith("Edit") && !text.startsWith("From ")) {
+                content.append(text).append("\n");
+            }
+        }
+    }
+    
+    private void parseWikiSections() {
+        if (wikiContent == null) return;
+        
+        wikiSections.clear();
+        String[] lines = wikiContent.split("\n");
+        String currentSection = "general";
+        StringBuilder sectionContent = new StringBuilder();
+        
+        for (String line : lines) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            
+            if (isHeading(line)) {
+                if (sectionContent.length() > 0) {
+                    wikiSections.put(currentSection.toLowerCase(), sectionContent.toString());
+                }
+                currentSection = line.replaceAll("[^a-zA-Z0-9\\s]", "").trim();
+                sectionContent = new StringBuilder();
+            } else {
+                sectionContent.append(line).append(" ");
+            }
+        }
+        
+        if (sectionContent.length() > 0) {
+            wikiSections.put(currentSection.toLowerCase(), sectionContent.toString());
+        }
+    }
+    
+    private boolean isHeading(String line) {
+        return line.length() < 100 && (line.matches(".*[A-Z].*") && !line.contains(".") && !line.contains(","));
+    }
+    
+    private String findRelevantContent(String query) {
+        if (wikiContent == null) return null;
+        
         String queryLower = query.toLowerCase();
+        String[] queryWords = queryLower.split("\\s+");
+        
         String bestMatch = null;
         int bestScore = 0;
         
-        for (String result : results) {
-            int score = calculateRelevanceScore(queryLower, result.toLowerCase());
-            if (score > bestScore) {
-                bestScore = score;
-                bestMatch = result;
+        for (Map.Entry<String, String> section : wikiSections.entrySet()) {
+            String sectionName = section.getKey();
+            String sectionContent = section.getValue().toLowerCase();
+            
+            int score = 0;
+            
+            if (sectionName.contains(queryLower) || sectionContent.contains(queryLower)) {
+                score += 10;
             }
-        }
-        
-        return bestScore > 0 ? bestMatch : (results.isEmpty() ? null : results.get(0));
-    }
-    
-    private int calculateRelevanceScore(String query, String title) {
-        int score = 0;
-        if (title.contains(query)) score += 10;
-        
-        String[] queryWords = query.split("\\s+");
-        for (String word : queryWords) {
-            if (word.length() > 2 && title.contains(word)) {
-                score += 3;
-            }
-        }
-        
-        return score;
-    }
-    
-    private String getPageContent(String pageTitle) throws IOException {
-        String url = String.format(PAGE_URL, pageTitle.replace(" ", "%20"));
-        Request request = new Request.Builder().url(url).build();
-        
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) return null;
             
-            String json = response.body().string();
-            return extractContentFromJson(json);
-        }
-    }
-    
-    private String extractContentFromJson(String json) {
-        try {
-            int textStart = json.indexOf("\"text\":{\"*\":\"");
-            if (textStart == -1) return null;
-            
-            textStart += 13;
-            int textEnd = json.indexOf("\"}}", textStart);
-            if (textEnd == -1) return null;
-            
-            String htmlContent = json.substring(textStart, textEnd);
-            htmlContent = htmlContent.replace("\\\"", "\"")
-                                   .replace("\\n", "\n")
-                                   .replace("\\/", "/");
-            
-            Document doc = Jsoup.parse(htmlContent);
-            
-            doc.select("script, style, .navbox, .infobox, .mw-editsection").remove();
-            
-            Elements paragraphs = doc.select("p, li");
-            StringBuilder content = new StringBuilder();
-            
-            for (Element p : paragraphs) {
-                String text = p.text().trim();
-                if (text.length() > 20 && !text.startsWith("This page") && !text.startsWith("From ")) {
-                    content.append(text).append(" ");
-                    if (content.length() > 1000) break;
+            for (String word : queryWords) {
+                if (word.length() > 2) {
+                    if (sectionName.contains(word)) score += 5;
+                    if (sectionContent.contains(word)) score += 2;
                 }
             }
             
-            return content.toString().trim();
-        } catch (Exception e) {
-            return null;
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = section.getValue();
+            }
         }
+        
+        if (bestMatch != null && bestScore > 3) {
+            return summarizeContent(bestMatch, query);
+        }
+        
+        return searchInFullContent(query);
+    }
+    
+    private String searchInFullContent(String query) {
+        if (wikiContent == null) return null;
+        
+        String[] sentences = wikiContent.split("[.!?]\\s+");
+        String queryLower = query.toLowerCase();
+        String[] queryWords = queryLower.split("\\s+");
+        
+        List<String> relevantSentences = new ArrayList<>();
+        
+        for (String sentence : sentences) {
+            sentence = sentence.trim();
+            if (sentence.length() < 20 || sentence.length() > 300) continue;
+            
+            String sentenceLower = sentence.toLowerCase();
+            int matches = 0;
+            
+            if (sentenceLower.contains(queryLower)) {
+                matches += 10;
+            } else {
+                for (String word : queryWords) {
+                    if (word.length() > 2 && sentenceLower.contains(word)) {
+                        matches++;
+                    }
+                }
+            }
+            
+            if (matches >= Math.min(2, queryWords.length)) {
+                relevantSentences.add(sentence);
+                if (relevantSentences.size() >= 3) break;
+            }
+        }
+        
+        if (relevantSentences.isEmpty()) return null;
+        
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < Math.min(2, relevantSentences.size()); i++) {
+            String sentence = relevantSentences.get(i).trim();
+            if (!sentence.endsWith(".") && !sentence.endsWith("!") && !sentence.endsWith("?")) {
+                sentence += ".";
+            }
+            result.append(sentence);
+            if (i < relevantSentences.size() - 1 && i < 1) {
+                result.append(" ");
+            }
+        }
+        
+        return result.toString().trim();
     }
     
     private String summarizeContent(String content, String query) {

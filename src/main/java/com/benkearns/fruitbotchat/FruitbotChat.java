@@ -127,9 +127,13 @@ public final class FruitbotChat extends JavaPlugin {
         }
         
         if (wikiService != null && shouldTryWikiLookup(originalMessage)) {
+            getLogger().info("[WikiDebug] Attempting wiki lookup for: " + originalMessage);
             String wikiResponse = wikiService.searchAndSummarize(originalMessage);
             if (wikiResponse != null && !wikiResponse.trim().isEmpty()) {
+                getLogger().info("[WikiDebug] Found wiki response: " + wikiResponse);
                 return new ResponseResult("wiki", wikiResponse);
+            } else {
+                getLogger().info("[WikiDebug] No wiki response found for: " + originalMessage);
             }
         }
         
@@ -145,22 +149,11 @@ public final class FruitbotChat extends JavaPlugin {
         
         String lower = message.toLowerCase().trim();
         
-        if (lower.matches("^[yn]$|^yes$|^no$|^ok$|^okay$|^k$|^thanks?$|^ty$|^bye$|^hello$|^hi$|^hey$")) {
+        if (lower.matches("^[yn]$|^yes$|^no$|^ok$|^okay$|^k$|^thanks?$|^ty$|^bye$")) {
             return false;
         }
         
-        String[] questionWords = {"what", "how", "where", "when", "why", "who", "can", "is", "are", "do", "does"};
-        for (String word : questionWords) {
-            if (lower.startsWith(word + " ") || lower.contains(" " + word + " ")) {
-                return true;
-            }
-        }
-        
-        if (lower.contains("?") || lower.split("\\s+").length >= 2) {
-            return true;
-        }
-        
-        return false;
+        return true;
     }
     
     boolean isOnCooldown(Player player) {
